@@ -8,10 +8,26 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     [SerializeField]
     private Animator animator;
+    [SerializeField]
+    private GameObject hip;
+    [SerializeField]
+    private GameObject rHand;
+
 
     private float angleY, dirZ, jumpForce = 6f, turnSpeed = 80f;
     private bool isGrounded;
     private Vector3 jumpDir;
+
+    public GameObject sword;
+    bool isSwordEquiped = false;
+    private float lastAttackTime = 0;
+
+    private Vector3 swordStartPos = Vector3.zero;
+
+    private void Start()
+    {
+        swordStartPos = sword.transform.position;
+    }
     
     void FixedUpdate()
     {
@@ -35,6 +51,8 @@ public class PlayerController : MonoBehaviour
             Move(dirZ, "isWalkForward", "isWalkBack");
             Sprint();
             Dodge();
+            SwordActivate();
+            UnequipeSword();
         }
         else
         {
@@ -100,5 +118,60 @@ public class PlayerController : MonoBehaviour
     {
         isGrounded = true;
         animator.applyRootMotion = true;
+    }
+
+    private void SwordEquip()
+    {
+        sword.transform.SetParent(rHand.transform);
+    }
+
+    private void SwordHolster()
+    {
+        sword.transform.SetParent(hip.transform);
+        sword.transform.position = swordStartPos;
+    }
+
+    private void SwordActivate()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if(!isSwordEquiped)
+            {
+                animator.Play("Sword_Equip");
+                isSwordEquiped = true;
+                lastAttackTime = Time.time;
+            }
+            else
+            {
+                animator.Play("Sword_Attack_R");
+                lastAttackTime = Time.time;
+            }
+        }
+    }
+
+    private void  UnequipeSword()
+    {
+        if (isSwordEquiped && Time.time > lastAttackTime + 5f)
+        {
+            animator.Play("Sword_Holster");
+            isSwordEquiped = false;
+        }
+    }
+
+    private void Attack()
+    {
+        int rand = Random.Range(0, 3);
+        switch (rand)
+        {
+            case 0:
+                animator.Play("Sword_Attack_R");
+                break;
+            case 1:
+                animator.Play("Sword_Attack_Combo_LL");
+                break;
+            case 2:
+                animator.Play("Sword_Attack_RLLR");
+                break;
+        }
     }
 }
