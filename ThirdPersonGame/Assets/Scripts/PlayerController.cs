@@ -23,10 +23,12 @@ public class PlayerController : MonoBehaviour
     private float lastAttackTime = 0;
 
     private Vector3 swordStartPos = Vector3.zero;
+    private Vector3 swordStartRotation = Vector3.zero;
 
     private void Start()
     {
-        swordStartPos = sword.transform.position;
+        swordStartPos = sword.transform.localPosition;
+        swordStartRotation = sword.transform.localEulerAngles;
     }
     
     void FixedUpdate()
@@ -66,7 +68,7 @@ public class PlayerController : MonoBehaviour
         animator.applyRootMotion = false;
         jumpDir = new Vector3(0f, jumpForce, dirZ * jumpForce / 2f);
         jumpDir = transform.TransformDirection(jumpDir);
-        rb.AddForce(jumpDir, ForceMode.Impulse);
+        rb.AddForce(jumpDir * 50, ForceMode.Impulse);
         isGrounded = false; 
     }
 
@@ -128,7 +130,8 @@ public class PlayerController : MonoBehaviour
     private void SwordHolster()
     {
         sword.transform.SetParent(hip.transform);
-        sword.transform.position = swordStartPos;
+        sword.transform.localPosition = swordStartPos;
+        sword.transform.localEulerAngles = swordStartRotation;
     }
 
     private void SwordActivate()
