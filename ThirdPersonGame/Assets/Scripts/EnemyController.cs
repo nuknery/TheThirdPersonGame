@@ -10,13 +10,14 @@ public class EnemyController : MonoBehaviour
     private Animator animator;
 
     [SerializeField]
-    private NavMeshAgent agent;
+    private UnityEngine.AI.NavMeshAgent agent;
     [SerializeField]
     private Transform playerT;
     private float prevAttackTime, pauseAttackWindow = 2.5f;
     [SerializeField]
     private Transform patrolTargets;
     private int currentTargetIndex = 0;
+    [HideInInspector]
     public bool isAttacking = false;
 
     void Start()
@@ -32,11 +33,11 @@ public class EnemyController : MonoBehaviour
             float dictanceToPlayer = Vector3.Distance(transform.position, playerT.position);
             if (distanceToPlayer < 2.5f)
             {
-                //attack
+                Attack();
             }
             else if (dictanceToPlayer > 30f)
             {
-                //patrol
+                PatrolBehavior();
             }
             else
             {
@@ -75,12 +76,23 @@ public class EnemyController : MonoBehaviour
 
     private void CheckNewPatrolTarget()
     {
-
+        Vector3 targetPos = patrolTargets[currentTargetIndex].position;
+        if(Vector3.Distance(transform.position, targetPosPos) < 0.5f)
+        {
+            if(currentTargetIndex < patrolTargets.Length - 1)
+            {
+                currentTargetIndex++;
+            }
+            else
+            {
+                currentTargetIndex = 0;
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.tag == "Weapon" && Time.time > prevHitTime + ignoreDamageWindow)
+        if (col.gameObject.tag == "Weapon" && Time.time > prevHitTime + ignoreDamageWindow && PlayerController.inctance.isAttacking)
         {
             health--;
             prevHitTime = Time.time;

@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour
     private Vector3 swordStartPos = Vector3.zero;
     private Vector3 swordStartRotation = Vector3.zero;
 
+    public bool isAttacking = false;
+
     private void Start()
     {
         swordStartPos = sword.transform.localPosition;
@@ -40,6 +42,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        isAttacking = animator.GetCurrentAnimatorStateInfo(0).isName("Sword_Hit_L_2");
         if (isGrounded)
         {
             if(Input.GetKeyDown(KeyCode.Space))
@@ -175,6 +178,14 @@ public class PlayerController : MonoBehaviour
             case 2:
                 animator.Play("Sword_Attack_RLLR");
                 break;
+        }
+    }
+
+    private void OnTriggerEnter(Collider col)
+    {
+        if(col.gameObject.tag == "Weapon" && Enemy.isAttacking)
+        {
+            animator.Play("Sword_Hit_L_2");
         }
     }
 }
